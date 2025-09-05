@@ -9,9 +9,9 @@
 
 ---
 
-## 📌 About PushKit
+## 📌 About Push Notification
 
-**PushKit** is a Laravel-based push notification service that supports:
+**Push Notification** is a Laravel-based push notification service that supports:
 
 - ✅ **Firebase Cloud Messaging (FCM)**  
 - ✅ **OneSignal**  
@@ -33,8 +33,8 @@ It allows sending push notifications to **Web, Flutter, Angular, and mobile apps
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-repo/pushkit.git
-cd pushkit
+git clone https://github.com/push-notification.git
+cd push-notification
 composer install
 php artisan key:generate
 ```
@@ -96,7 +96,7 @@ MAIL_USERNAME=your-username
 MAIL_PASSWORD=your-password
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=no-reply@example.com
-MAIL_FROM_NAME="PushKit"
+MAIL_FROM_NAME="Push Notification"
 ```
 
 ## 📂 File Placement
@@ -160,7 +160,7 @@ php artisan queue:work
 
 Open in browser:
 ```
-https://pushkit.test/
+https://push-notification.test/
 ```
 
 - **Firebase** → retrieves device token & shows Bootstrap toasts.
