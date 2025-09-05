@@ -7,60 +7,180 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 About PushKit
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**PushKit** is a Laravel-based push notification service that supports:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- ✅ **Firebase Cloud Messaging (FCM)**  
+- ✅ **OneSignal**  
+- ✅ **Email notifications**
 
-## Learning Laravel
+It allows sending push notifications to **Web, Flutter, Angular, and mobile apps**, with flexible drivers controlled by environment variables.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🔧 Requirements
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.1+  
+- Laravel 10/11/12  
+- Composer  
+- Node.js (optional, for frontend testing)  
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📦 Installation
 
-### Premium Partners
+```bash
+git clone https://github.com/your-repo/pushkit.git
+cd pushkit
+composer install
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## ⚙️ Configuration
 
-## Contributing
+### 1. Firebase Setup
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Go to [Firebase Console](https://console.firebase.google.com) and create a project.
+2. Enable Cloud Messaging.
+3. Download the `service-account.json`.
+4. Place it at:
+   ```
+   storage/app/firebase/file.json
+   ```
+5. Add to `.env`:
 
-## Code of Conduct
+```env
+PUSH_DRIVER=fcm
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+FIREBASE_CREDENTIALS=storage/app/firebase/file.json
+FIREBASE_API_KEY=your-api-key
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FCM_SENDER_ID=your-sender-id
+FIREBASE_APP_ID=your-app-id
+FIREBASE_MEASUREMENT_ID=your-measurement-id
+FIREBASE_VAPID_PUBLIC_KEY=your-vapid-public-key
+```
 
-## Security Vulnerabilities
+### 2. OneSignal Setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Go to [OneSignal Dashboard](https://onesignal.com).
+2. Create a Web Push App.
+3. Get your App ID and REST API Key.
+4. (Optional) Enable Safari push and copy `safari_web_id`.
+5. Add to `.env`:
 
-## License
+```env
+PUSH_DRIVER=onesignal
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+ONESIGNAL_APP_ID=your-onesignal-app-id
+ONESIGNAL_API_KEY=your-onesignal-rest-api-key
+ONESIGNAL_SAFARI_WEB_ID=your-optional-safari-id
+```
+
+### 3. Email Setup
+
+Enable email notification fallback with `.env`:
+
+```env
+ENABLE_EMAIL=true
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your-username
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=no-reply@example.com
+MAIL_FROM_NAME="PushKit"
+```
+
+## 📂 File Placement
+
+- **Firebase JSON** → `storage/app/firebase/file.json`
+- **Firebase Service Worker** → `public/firebase-messaging-sw.js`
+- **OneSignal Service Workers** →
+  - `public/OneSignalSDKWorker.js`
+  - `public/OneSignalSDKUpdaterWorker.js`
+
+## 🔑 Environment Toggles
+
+You can enable/disable services:
+
+```env
+ENABLE_PUSH_NOTIFICATION=true
+ENABLE_EMAIL=false
+```
+
+## 🚀 Usage
+
+### Example API Call (Postman)
+
+**POST** `/api/push/send`
+
+```json
+{
+  "tokens": [
+    "firebase-device-token-or-onesignal-player-id"
+  ],
+  "title": "Hello World",
+  "body": "This is a test push notification",
+  "image": "https://example.com/image.png",
+  "click_action": "https://your-site.test/",
+  "email": [
+    "user@example.com"
+  ]
+}
+```
+
+### Example Response
+
+```json
+{
+  "ok": true,
+  "message": "Push queued/sent",
+  "report": { ... }
+}
+```
+
+## 📨 Email Notifications
+
+- Emails use the built-in `PushNotificationMail`.
+- Run the queue worker to process them:
+
+```bash
+php artisan queue:work
+```
+
+## 🖥️ Testing Locally
+
+Open in browser:
+```
+https://pushkit.test/
+```
+
+- **Firebase** → retrieves device token & shows Bootstrap toasts.
+- **OneSignal** → retrieves Player ID & shows custom toasts in Chrome/Edge.
+
+## 📋 Notes
+
+- Firebase foreground notifications show Bootstrap toasts.
+- OneSignal foreground notifications show custom toasts in Chromium browsers only.
+- Safari/Firefox always show system notifications (cannot be prevented).
+- Always refresh and store tokens in your DB for real-world apps.
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first.
+
+## 🔒 Security
+
+If you discover a security vulnerability, please report it privately.
+
+## 📜 License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
