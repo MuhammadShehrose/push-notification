@@ -35,6 +35,23 @@ class OneSignalPushService
             'Content-Type'  => 'application/json',
         ])->post('https://onesignal.com/api/v1/notifications', $payload);
 
-        return $response->json();
+        $json = $response->json();
+
+        // Normalize response similar to FcmPushService
+        $failedTokens = [];
+
+        if (isset($json['errors']) && is_array($json['errors'])) {
+            // If OneSignal rejected tokens, include them
+            $failedTokens = $tokens;
+        }
+
+        return [
+            'success'       => empty($failedTokens) ? count($tokens) : (count($tokens) - count($failedTokens)),
+            'failure'       => count($failedTokens),
+            'failed_tokens' => $failedTokens,
+            'tokens'        => $tokens,
+            // 'raw'           => $json, // optional for debugging
+        ];
+
     }
 }
